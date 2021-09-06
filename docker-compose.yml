@@ -1,8 +1,8 @@
-version: '3.8'
+version : '3.8'
 
 services:
   docker-gs-ping-roach:
-    depends_on: 
+    depends_on:
       - roach
     build:
       context: .
@@ -17,12 +17,12 @@ services:
       - PGPASSWORD=${PGPASSWORD:?database password not set}
       - PGHOST=${PGHOST:-db}
       - PGPORT=${PGPORT:-26257}
-      - PGDATABASE=${PGDATABASE-mydb}
+      - PGDATABASE=${PGDATABASE:-mydb}
     deploy:
       restart_policy:
         condition: on-failure
   roach:
-    image: cockroachdb/cockroach:latest-v20.1
+    image: cockroachdb/cockroach:latest
     container_name: roach
     hostname: db
     networks:
@@ -33,7 +33,6 @@ services:
     volumes:
       - roach:/cockroach/cockroach-data
     command: start-single-node --insecure
-
 volumes:
   roach:
 
