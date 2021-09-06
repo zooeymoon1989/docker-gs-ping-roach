@@ -13,7 +13,7 @@ func TestRespondsWithLove(t *testing.T) {
 	pool, err := dockertest.NewPool("")
 	require.NoError(t, err, "could not connect to Docker")
 
-	resource, err := pool.Run("docker-gs-ping-roach", "latest", []string{})
+	resource, err := pool.Run("docker-gs-ping", "latest", []string{})
 	require.NoError(t, err, "could not start container")
 
 	t.Cleanup(func() {
@@ -23,7 +23,7 @@ func TestRespondsWithLove(t *testing.T) {
 	var resp *http.Response
 
 	err = pool.Retry(func() error {
-		resp, err = http.Get(fmt.Sprint("http://localhost:", resource.GetPort("80/tcp"), "/"))
+		resp, err = http.Get(fmt.Sprint("http://localhost:", resource.GetPort("8080/tcp"), "/"))
 		if err != nil {
 			t.Log("container not ready, waiting...")
 			return err
@@ -48,7 +48,7 @@ func TestHealthCheck(t *testing.T)  {
 	pool, err := dockertest.NewPool("")
 	require.NoError(t, err, "could not connect to Docker")
 
-	resource, err := pool.Run("docker-gs-ping-roach", "latest", []string{})
+	resource, err := pool.Run("docker-gs-ping", "latest", []string{})
 	require.NoError(t, err, "could not start container")
 
 	t.Cleanup(func() {
@@ -58,7 +58,7 @@ func TestHealthCheck(t *testing.T)  {
 	var resp *http.Response
 
 	err = pool.Retry(func() error {
-		resp, err = http.Get(fmt.Sprint("http://localhost:", resource.GetPort("80/tcp"), "/ping"))
+		resp, err = http.Get(fmt.Sprint("http://localhost:", resource.GetPort("8080/tcp"), "/ping"))
 		if err != nil {
 			t.Log("container not ready, waiting...")
 			return err
@@ -73,5 +73,6 @@ func TestHealthCheck(t *testing.T)  {
 	body, err := io.ReadAll(resp.Body)
 	require.NoError(t, err, "failed to read HTTP body")
 
-	require.JSONEq(t, `{"Status":"OK"}`,string(body),"does not respond with valid JSON?")
+	// Finally, test the business requirement!
+	require.JSONEq(t, `{"Status":"OK"}`, string(body), "does not respond with valid JSON?")
 }
